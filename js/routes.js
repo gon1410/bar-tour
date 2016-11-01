@@ -29,7 +29,7 @@ angular.module('app.routes', [])
   .state('conectate', {
     url: '/page5',
     templateUrl: 'templates/conectate.html',
-    controller: 'conectateCtrl'
+    controller: 'conectateCtrl as con'
   })
 
   .state('bolichNPage', {
