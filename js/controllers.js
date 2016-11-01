@@ -13,49 +13,49 @@ function ($scope, $stateParams) {
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
 function ($scope, $stateParams,$state) {
 
-	this.login = function(){
-		FB.login(function(response){
-			if (response.status === 'connected') {
-				console.log($stateParams);
-				$state.go('tabsController.increBleListaDeBoliches');
-				testAPI();
+  this.login = function(){
+    FB.login(function(response){
+      if (response.status === 'connected') {
+        console.log($stateParams);
+        $state.go('tabsController.increBleListaDeBoliches');
+        testAPI();
 
         //$state.go('tabsController.increBleListaDeBoliches');
     } else {
-    	console.log('culo');
-    	console.log('asdasdasd');
+      console.log('culo');
+      console.log('asdasdasd');
     }
 
 });
-		$state.go('tabsController.increBleListaDeBoliches');
-	};
+    $state.go('tabsController.increBleListaDeBoliches');
+  };
 
-	window.fbAsyncInit = function() {
-		FB.init({
-			appId      : '160092111073157',
-			xfbml      : true,
-			version    : 'v2.8'
-		});
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '160092111073157',
+      xfbml      : true,
+      version    : 'v2.8'
+    });
 
-		FB.getLoginStatus(function (response) {
-			if (response.status === 'connected') {
-				console.log($stateParams);
-				$state.go('tabsController.increBleListaDeBoliches');
-				testAPI();
+    FB.getLoginStatus(function (response) {
+      if (response.status === 'connected') {
+        console.log($stateParams);
+        $state.go('tabsController.increBleListaDeBoliches');
+        testAPI();
 
         //$state.go('tabsController.increBleListaDeBoliches');
     } else {
-    	console.log('culo');
+      console.log('culo');
     }
 });
-	};
+  };
   // Load the SDK asynchronously
   (function(d, s, id){
-  	var js, fjs = d.getElementsByTagName(s)[0];
-  	if (d.getElementById(id)) {return;}
-  	js = d.createElement(s); js.id = id;
-  	js.src = "//connect.facebook.net/en_US/sdk.js";
-  	fjs.parentNode.insertBefore(js, fjs);
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
 
 
@@ -63,9 +63,9 @@ function ($scope, $stateParams,$state) {
   // Button.  See the onlogin handler attached to it in the sample
   // code below.
   function checkLoginState() {
-  	FB.getLoginStatus(function(response) {
-  		statusChangeCallback(response);
-  	});
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
   }
 
 
@@ -90,10 +90,10 @@ function ($scope, $stateParams,$state) {
   // Here we run a very simple test of the Graph API after login is
   // successful.  See statusChangeCallback() for when this call is made.
   function testAPI() {
-  	console.log('Welcome!  Fetching your information.... ');
-  	FB.api('/me', function(response) {
-  		console.log('Successful login for: ' + response.name);
-  	});
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+    });
   }
 
 }])
@@ -121,3 +121,60 @@ function ($scope, $stateParams) {
 
 
 }])
+
+.controller('MapCtrl', function($scope, $ionicLoading, $compile) {
+      function initialize() {
+        var myLatlng = new google.maps.LatLng(-34.900006,-57.955929);
+        var mapOptions = {
+          center: myLatlng,
+          zoom: 16,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(document.getElementById("map"),
+            mapOptions);
+        
+        //Marker + infowindow + angularjs compiled ng-click
+        var contentString = "<div><a ng-click='clickTest()'>Click me!</a></div>";
+        var compiled = $compile(contentString)($scope);
+
+        var infowindow = new google.maps.InfoWindow({
+          content: compiled[0]
+        });
+
+        var marker = new google.maps.Marker({
+          position: myLatlng,
+          map: map,
+          title: 'Uluru (Ayers Rock)'
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.open(map,marker);
+        });
+
+        $scope.map = map;
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+      
+      $scope.centerOnMe = function() {
+        if(!$scope.map) {
+          return;
+        }
+
+        $scope.loading = $ionicLoading.show({
+          content: 'Getting current location...',
+          showBackdrop: false
+        });
+
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+          $scope.loading.hide();
+        }, function(error) {
+          alert('Unable to get location: ' + error.message);
+        });
+      };
+      
+      $scope.clickTest = function() {
+        alert('Example of infowindow with ng-click')
+      };
+      
+    })
