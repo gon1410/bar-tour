@@ -1,6 +1,5 @@
 app = angular.module('app.controllers', []);
 
-var profilePicture;
 
 app.controller('increBleListaDeBolichesCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
@@ -13,39 +12,39 @@ function ($scope, $stateParams) {
 app.controller('conectateCtrl', ['$scope', '$stateParams','$state', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$state) {
+function ($scope, $stateParams,$state,$ionicLoading) {
   this.prueba = 1;
   
   this.login = function(){
-
     console.log("login");
     FB.login(function(response){
-      if (response.status === 'connected') {
-        console.log($stateParams);
-        testAPI();
-        
-
-        $state.go('tabsController.increBleListaDeBoliches');
-      } else {
-        console.log('culo');
-        console.log('asdasdasd');
-      }
-
+      checkLoginState()
     });
     //$state.go('tabsController.increBleListaDeBoliches');
-    console.log("sdfasdf");
-    console.log("culo");
-  };
-
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '160092111073157',
-      xfbml      : true,
-      version    : 'v2.8'
-    });
-
     
   };
+  this.logout = function(){
+
+   FB.getLoginStatus(function(response) {
+    if (response && response.status === 'connected') {
+      FB.logout(function(response) {
+        $state.go('conectate');      });
+    }
+  });
+
+ }
+
+ window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '160092111073157',
+    xfbml      : true,
+    version    : 'v2.8'
+  });
+  checkLoginState()
+
+
+
+};
   // Load the SDK asynchronously
   (function(d, s, id){
     var js, fjs = d.getElementsByTagName(s)[0];
@@ -61,7 +60,19 @@ function ($scope, $stateParams,$state) {
   // code below.
   function checkLoginState() {
     FB.getLoginStatus(function(response) {
-      statusChangeCallback(response);
+      if (response.status === 'connected') {
+        FB.api('/me/picture', function(response) {
+          console.log('URL ' + response.data.url);
+          document.getElementById("profilePicture").src=response.data.url;
+        });
+        $state.go('tabsController.increBleListaDeBoliches');
+      } 
+      else {
+        if($state === "tabsController.increBleListaDeBoliches"){
+          $state.go('conectate');
+          window.alert("Conectate para usar el servicio");
+        }
+      } 
     });
   }
 
@@ -75,12 +86,7 @@ function ($scope, $stateParams,$state) {
       
     });
 
-    FB.api('/me/picture', function(response) {
 
-      $scope.profilePicture = response.data.url 
-      
-    });
-    //console.log($scope.profilePicture);s
     
   }
 
@@ -111,6 +117,7 @@ function ($scope, $stateParams) {
 }])
 
 app.controller('MapCtrl', function($scope, $ionicLoading, $compile) {
+
   function initialize() {
     var myLatlng = new google.maps.LatLng(-34.900006,-57.955929);
     var mapOptions = {
@@ -118,6 +125,7 @@ app.controller('MapCtrl', function($scope, $ionicLoading, $compile) {
       zoom: 16,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
+
     var map = new google.maps.Map(document.getElementById("map"),
       mapOptions);
 
