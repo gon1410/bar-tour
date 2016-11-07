@@ -1,0 +1,18 @@
+{
+	"bares":
+	[
+		{
+			"nombre":"Wilkenny",
+			"imageUrl":"/data/images/wilkenny.jpg"
+		},
+		{
+			"nombre":"La Casona",
+			"imageUrl":"/data/images/la-casona.jpg"
+		},
+		{
+			"nombre":"Club Pierchic",
+			"imageUrl":"/data/images/pierchic.jpg"
+		}	
+
+	]
+}
